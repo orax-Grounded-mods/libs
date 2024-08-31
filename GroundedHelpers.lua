@@ -37,8 +37,8 @@ end
 ---@param texturePath string
 function Grounded.ShowMessage(message, texturePath)
   ExecuteInGameThread(function()
-    local uiStatics = Grounded.SurvivalGameplayStatics()
-    local ui = uiStatics:GetGameUI(UEHelpers.GetGameViewportClient())
+    local statics = Grounded.SurvivalGameplayStatics()
+    local ui = statics:GetGameUI(UEHelpers.GetGameViewportClient())
 
     if texturePath == nil then
       -- display message without icon
@@ -61,12 +61,12 @@ end
 ---@param message string
 function Grounded.PostPlayerChatMessage(message)
   ---@class UUserInterfaceStatics
-  local uiStatics = Grounded.GetUserInterfaceStatics()
+  local statics = Grounded.GetUserInterfaceStatics()
   ---@class USurvivalGameplayStatics
   local survivalGameplayStatics = Grounded.GetSurvivalGameplayStatics()
 
-  if uiStatics and survivalGameplayStatics then
-    local ui = uiStatics:GetGameUI(UEHelpers.GetGameViewportClient())
+  if statics and survivalGameplayStatics then
+    local ui = statics:GetGameUI(UEHelpers.GetGameViewportClient())
     local state = survivalGameplayStatics:GetLocalSurvivalPlayerState(UEHelpers.GetGameViewportClient())
 
     ui:PostPlayerChatMessage(FString(message), state)
