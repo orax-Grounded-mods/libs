@@ -60,9 +60,10 @@ end
 
 ---@param message string
 function Grounded.PostPlayerChatMessage(message)
-  ---@class UUserInterfaceStatics
+  ---@type UUserInterfaceStatics
   local statics = Grounded.GetUserInterfaceStatics()
-  ---@class USurvivalGameplayStatics
+
+  ---@type USurvivalGameplayStatics
   local survivalGameplayStatics = Grounded.GetSurvivalGameplayStatics()
 
   if statics and survivalGameplayStatics then
