@@ -88,4 +88,14 @@ function Grounded.GetUserInterfaceStatics(ForceInvalidateCache)
     ForceInvalidateCache)
 end
 
+function Grounded.GetLocalSurvivalPlayerCharacter()
+  local statics = Grounded.GetSurvivalGameplayStatics()
+  local pc = statics:GetLocalSurvivalPlayerCharacter(UEHelpers.GetGameViewportClient())
+  if not pc or not pc:IsValid() then
+    error("No LocalSurvivalPlayerCharacter found.\n")
+  end
+
+  return pc
+end
+
 return Grounded
