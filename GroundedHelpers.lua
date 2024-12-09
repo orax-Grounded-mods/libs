@@ -1,13 +1,14 @@
 local UEHelpers = require("UEHelpers")
-local Grounded = {}
+local M = {}
 
-Grounded.textures = {
+M.textures = {
   icon_Build = "/Game/UI/Images/T_UI_Build.T_UI_Build",
   icon_Sleep = "/Game/UI/Images/FlagIcons/T_UI_Flag_Sleep.T_UI_Flag_Sleep",
   icon_Zipline = "/Game/Blueprints/Items/Icons/Buildings/ICO_BLDG_Zipline_Anchor.ICO_BLDG_Zipline_Anchor",
   icon_CancelBuild = "/Game/UI/Images/ActionIcons/T_UI_CancelBuild.T_UI_CancelBuild",
   icon_Science_RS = "/Game/UI/Images/T_UI_Science_MainChunk.T_UI_Science_MainChunk",
-  icon_ChatStop = "/Game/UI/Images/Chat/T_UI_Chat_Stop.T_UI_Chat_Stop"
+  icon_ChatStop = "/Game/UI/Images/Chat/T_UI_Chat_Stop.T_UI_Chat_Stop",
+  icon_Storage = "/Game/UI/Images/T_UI_Storage.T_UI_Storage"
 }
 
 ---@param objectFullName string
@@ -35,39 +36,42 @@ end
 
 ---@param message string
 ---@param texturePath string
-function Grounded.ShowMessage(message, texturePath)
+function M.ShowMessage(message, texturePath)
   ExecuteInGameThread(function()
-    local statics = Grounded.SurvivalGameplayStatics()
+    local statics = M.GetUserInterfaceStatics()
     local ui = statics:GetGameUI(UEHelpers.GetGameViewportClient())
 
     if texturePath == nil then
       -- display message without icon
+      ---@diagnostic disable-next-line: param-type-mismatch
       ui:PostGenericMessage(message, nil)
       return
     end
 
     local obj = StaticFindObject(texturePath)
 
-    if obj == nil or not obj:IsValid() then
+    ---@cast obj UTexture2D
+    if not obj:IsValid() then
       -- load texture
       LoadAsset(texturePath)
     end
 
     -- display message with icon
+    ---@diagnostic disable-next-line: param-type-mismatch
     ui:PostGenericMessage(message, obj)
   end)
 end
 
 ---@param message string
-function Grounded.PostPlayerChatMessage(message)
-  ---@type UUserInterfaceStatics
-  local statics = Grounded.GetUserInterfaceStatics()
+function M.PostPlayerChatMessage(message)
+  local uistatics = M.GetUserInterfaceStatics()
+  local survivalGameplayStatics = M.GetSurvivalGameplayStatics()
 
-  ---@type USurvivalGameplayStatics
-  local survivalGameplayStatics = Grounded.GetSurvivalGameplayStatics()
+  ---@cast uistatics UUserInterfaceStatics
+  ---@cast survivalGameplayStatics USurvivalGameplayStatics
 
-  if statics and survivalGameplayStatics then
-    local ui = statics:GetGameUI(UEHelpers.GetGameViewportClient())
+  if uistatics and survivalGameplayStatics then
+    local ui = uistatics:GetGameUI(UEHelpers.GetGameViewportClient())
     local state = survivalGameplayStatics:GetLocalSurvivalPlayerState(UEHelpers.GetGameViewportClient())
 
     ui:PostPlayerChatMessage(FString(message), state)
@@ -75,22 +79,25 @@ function Grounded.PostPlayerChatMessage(message)
 end
 
 ---@param ForceInvalidateCache boolean | nil
----@return UObject
-function Grounded.GetSurvivalGameplayStatics(ForceInvalidateCache)
+---@return USurvivalGameplayStatics
+function M.GetSurvivalGameplayStatics(ForceInvalidateCache)
+  ---@diagnostic disable-next-line: return-type-mismatch
   return CacheDefaultObject("/Script/Maine.Default__SurvivalGameplayStatics", "Grounded_SurvivalGameplayStatics",
     ForceInvalidateCache)
 end
 
 ---@param ForceInvalidateCache boolean | nil
----@return UObject
-function Grounded.GetUserInterfaceStatics(ForceInvalidateCache)
+---@return UUserInterfaceStatics
+function M.GetUserInterfaceStatics(ForceInvalidateCache)
+  ---@diagnostic disable-next-line: return-type-mismatch
   return CacheDefaultObject("/Script/Maine.Default__UserInterfaceStatics", "Grounded_UserInterfaceStatics",
     ForceInvalidateCache)
 end
 
-function Grounded.GetLocalSurvivalPlayerCharacter()
-  local statics = Grounded.GetSurvivalGameplayStatics()
-  local pc = statics:GetLocalSurvivalPlayerCharacter(UEHelpers.GetGameViewportClient())
+function M.GetLocalSurvivalPlayerCharacter()
+  local survivalGameplayStatics = M.GetSurvivalGameplayStatics()
+  ---@cast survivalGameplayStatics USurvivalGameplayStatics
+  local pc = survivalGameplayStatics:GetLocalSurvivalPlayerCharacter(UEHelpers.GetGameViewportClient())
   if not pc or not pc:IsValid() then
     error("No LocalSurvivalPlayerCharacter found.\n")
   end
@@ -98,4 +105,4 @@ function Grounded.GetLocalSurvivalPlayerCharacter()
   return pc
 end
 
-return Grounded
+return M
